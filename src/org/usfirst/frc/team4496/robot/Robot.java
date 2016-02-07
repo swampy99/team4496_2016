@@ -9,7 +9,6 @@ import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Scheduler;
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.Solenoid;
-import org.usfirst.frc.team4496.robot.subsystems.ExampleSubsystem;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
@@ -20,11 +19,9 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  * directory.
  */
 public class Robot extends IterativeRobot {
-
-	public static final ExampleSubsystem exampleSubsystem = new ExampleSubsystem();
 	public static OI oi;
 
-		//Ben was here
+		//###################Ben was here
 		//start of added code
 		Solenoid grabberArm, catapultArm;
 		Compressor mainCompressor;
@@ -49,10 +46,12 @@ public class Robot extends IterativeRobot {
         upperSwitch = new DigitalInput(0);
         lowerSwitch = new DigitalInput(1);
         
+        /*
         //pnumatics declarations
         mainCompressor = new Compressor(1);
         mainCompressor.setClosedLoopControl(false);
         grabberArm = new Solenoid(1);
+        */
         
     }
 	
