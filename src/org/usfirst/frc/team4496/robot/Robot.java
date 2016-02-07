@@ -7,7 +7,8 @@ import edu.wpi.first.wpilibj.RobotDrive;
 import edu.wpi.first.wpilibj.Talon;
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Scheduler;
-import edu.wpi.first.wpilibj.livewindow.LiveWindow;
+import edu.wpi.first.wpilibj.Compressor;
+import edu.wpi.first.wpilibj.Solenoid;
 import org.usfirst.frc.team4496.robot.subsystems.ExampleSubsystem;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -23,7 +24,10 @@ public class Robot extends IterativeRobot {
 	public static final ExampleSubsystem exampleSubsystem = new ExampleSubsystem();
 	public static OI oi;
 
+		//Ben was here
 		//start of added code
+		Solenoid grabberArm, catapultArm;
+		Compressor mainCompressor;
 		RobotDrive mainDrive, testDrive;
 		Talon liftDrive;
 		DigitalInput upperSwitch, lowerSwitch;
@@ -37,13 +41,19 @@ public class Robot extends IterativeRobot {
     	
     	// instantiate the command used for the autonomous period
         
-        //mainDrive = new RobotDrive(RobotMap.leftFrontMotor, RobotMap.leftRearMotor, RobotMap.rightFrontMotor, RobotMap.rightFrontMotor);
-        mainDrive = new RobotDrive(0, 1, 2, 3);
+        mainDrive = new RobotDrive(RobotMap.leftFrontMotor, RobotMap.leftRearMotor, RobotMap.rightFrontMotor, RobotMap.rightFrontMotor);
+        //mainDrive = new RobotDrive(0, 1, 2, 3);
         mainDrive.setInvertedMotor(RobotDrive.MotorType.kFrontRight, true);
         mainDrive.setInvertedMotor(RobotDrive.MotorType.kRearRight, true);
         liftDrive = new Talon(RobotMap.mainLiftMotor);
         upperSwitch = new DigitalInput(0);
         lowerSwitch = new DigitalInput(1);
+        
+        //pnumatics declarations
+        mainCompressor = new Compressor(1);
+        mainCompressor.setClosedLoopControl(false);
+        grabberArm = new Solenoid(1);
+        
     }
 	
 		/**
@@ -94,26 +104,46 @@ public class Robot extends IterativeRobot {
         Scheduler.getInstance().run();
         //main drive setup
         
-        //set the input values
+        //Getting and rounding the input values
         double lXVal = OI.controller.getRawAxis(0);
         double lYVal = OI.controller.getRawAxis(1);
         double rXVal = OI.controller.getRawAxis(4);
-        
-        //round the values
         lXVal = ((double)((int)(lXVal  * 10)) ) / 20;
         lYVal = ((double)((int)(lYVal  * 10)) ) / 20;
         rXVal = ((double)((int)(rXVal  * 10)) ) / 20;
         
-        //output the values
+        //SmartDashboard output
         SmartDashboard.putDouble("LeftStickXValue", lXVal);
         SmartDashboard.putDouble("LeftStickYValue", lYVal);
         SmartDashboard.putDouble("RightStickXValue", rXVal);
         SmartDashboard.putInt("POVPad", OI.controller.getPOV());
         
-        
-        //drive with the values
+        //main drive controls
         mainDrive.mecanumDrive_Cartesian(lXVal, lYVal, rXVal, 0);
+        /*
+        //Compressor controls
+        boolean pressureSwitch = mainCompressor.getPressureSwitchValue();
+        if(pressureSwitch){
+        	mainCompressor.start();
+        } else {
+        	mainCompressor.stop();
+        }
         
+        //Grabber arm controls
+        if(OI.controller.getRawButton(1)){
+        	grabberArm.set(true);
+        } 
+        if(OI.controller.getRawButton(2)) {
+        	grabberArm.set(false);
+        }
+        
+        //Catapult controls
+        if(OI.controller.getRawButton(6)){
+        	catapultArm.set(true);
+        } else {
+        	catapultArm.set(false);
+        }
+        */
        
     }
     
