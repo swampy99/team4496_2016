@@ -4,7 +4,7 @@ package org.usfirst.frc.team4496.robot;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.RobotDrive;
-import edu.wpi.first.wpilibj.Talon;
+import edu.wpi.first.wpilibj.Victor;
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Scheduler;
 import edu.wpi.first.wpilibj.Compressor;
@@ -26,9 +26,8 @@ public class Robot extends IterativeRobot {
 		Solenoid grabberArm, catapultArm;
 		Compressor mainCompressor;
 		RobotDrive mainDrive, testDrive;
-		Talon liftDrive;
-		DigitalInput upperSwitch, lowerSwitch;
-	    Command testCommand;
+		Victor liftDrive;
+		//DigitalInput upperSwitch, lowerSwitch;
 
 	    /**
 	     * This function is run when the robot is first started up and should be
@@ -38,20 +37,21 @@ public class Robot extends IterativeRobot {
     	
     	// instantiate the command used for the autonomous period
         
-        mainDrive = new RobotDrive(RobotMap.leftFrontMotor, RobotMap.leftRearMotor, RobotMap.rightFrontMotor, RobotMap.rightFrontMotor);
-        //mainDrive = new RobotDrive(0, 1, 2, 3);
+        //mainDrive = new RobotDrive(RobotMap.leftFrontMotor, RobotMap.leftRearMotor, RobotMap.rightFrontMotor, RobotMap.rightFrontMotor);
+        mainDrive = new RobotDrive(0, 1, 2, 3);
         mainDrive.setInvertedMotor(RobotDrive.MotorType.kFrontRight, true);
         mainDrive.setInvertedMotor(RobotDrive.MotorType.kRearRight, true);
-        liftDrive = new Talon(RobotMap.mainLiftMotor);
-        upperSwitch = new DigitalInput(0);
-        lowerSwitch = new DigitalInput(1);
+        liftDrive = new Victor(4);
+        //upperSwitch = new DigitalInput(0);
+        //lowerSwitch = new DigitalInput(1);
         
-        /*
+        
         //pnumatics declarations
         mainCompressor = new Compressor(1);
         mainCompressor.setClosedLoopControl(false);
-        grabberArm = new Solenoid(1);
-        */
+        grabberArm = new Solenoid(0);
+        catapultArm = new Solenoid(1);
+        
         
     }
 	
@@ -119,7 +119,7 @@ public class Robot extends IterativeRobot {
         
         //main drive controls
         mainDrive.mecanumDrive_Cartesian(lXVal, lYVal, rXVal, 0);
-        /*
+        
         //Compressor controls
         boolean pressureSwitch = mainCompressor.getPressureSwitchValue();
         if(pressureSwitch){
@@ -142,7 +142,15 @@ public class Robot extends IterativeRobot {
         } else {
         	catapultArm.set(false);
         }
-        */
+        
+        //Lifter Code
+        if(OI.controller.getPOV() == 0){
+        	liftDrive.set(-1);
+        } else if(OI.controller.getPOV() == 180) {
+        	liftDrive.set(1);
+        } else {
+        	liftDrive.set(0);
+        }
        
     }
     
