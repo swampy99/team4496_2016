@@ -47,7 +47,7 @@ public class Robot extends IterativeRobot {
         
         
         //pnumatics declarations
-        mainCompressor = new Compressor(1);
+        mainCompressor = new Compressor();
         mainCompressor.setClosedLoopControl(false);
         grabberArm = new Solenoid(0);
         catapultArm = new Solenoid(1);
@@ -116,13 +116,13 @@ public class Robot extends IterativeRobot {
         SmartDashboard.putDouble("LeftStickYValue", lYVal);
         SmartDashboard.putDouble("RightStickXValue", rXVal);
         SmartDashboard.putInt("POVPad", OI.controller.getPOV());
+        SmartDashboard.putBoolean("Compressor Status", !mainCompressor.getPressureSwitchValue());
         
         //main drive controls
         mainDrive.mecanumDrive_Cartesian(lXVal, lYVal, rXVal, 0);
         
         //Compressor controls
-        boolean pressureSwitch = mainCompressor.getPressureSwitchValue();
-        if(pressureSwitch){
+        if(!mainCompressor.getPressureSwitchValue()){
         	mainCompressor.start();
         } else {
         	mainCompressor.stop();
@@ -138,16 +138,16 @@ public class Robot extends IterativeRobot {
         
         //Catapult controls
         if(OI.controller.getRawButton(6)){
-        	catapultArm.set(true);
-        } else {
         	catapultArm.set(false);
+        } else {
+        	catapultArm.set(true);
         }
         
         //Lifter Code
-        if(OI.controller.getPOV() == 0){
-        	liftDrive.set(-1);
-        } else if(OI.controller.getPOV() == 180) {
-        	liftDrive.set(1);
+        if(OI.controller.getPOV() == 180){
+        	liftDrive.set(-.5);
+        } else if(OI.controller.getPOV() == 0) {
+        	liftDrive.set(.5);
         } else {
         	liftDrive.set(0);
         }
