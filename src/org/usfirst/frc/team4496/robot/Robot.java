@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
+
 /**
  * The VM is configured to automatically run this class, and to call the
  * functions corresponding to each mode, as described in the IterativeRobot
@@ -101,25 +102,43 @@ public class Robot extends IterativeRobot {
     @SuppressWarnings("deprecation")
 	public void teleopPeriodic() {
         Scheduler.getInstance().run();
+        int x = 20;
         //main drive setup
+        /*if(OI.controller.getRawButton(9)){
+        	x = 40;
+        } else if(OI.controller.getRawButton(10)) {
+        	x = 60;
+        } else {
+        	x = 20;
+        }*/
+        
         
         //Getting and rounding the input values
         double lXVal = OI.controller.getRawAxis(0);
         double lYVal = OI.controller.getRawAxis(1);
+        double lTVal = OI.controller.getRawAxis(2);
+        double rTVal = OI.controller.getRawAxis(3);
         double rXVal = OI.controller.getRawAxis(4);
-        lXVal = ((double)((int)(lXVal  * 10)) ) / 20;
-        lYVal = ((double)((int)(lYVal  * 10)) ) / 20;
-        rXVal = ((double)((int)(rXVal  * 10)) ) / 20;
+        double rYVal = OI.controller.getRawAxis(5);
+        double sumTriggerValue = (lTVal + rTVal + 1) * 20;
+        double rotDrv = ((double)((int)(lXVal  * 10)) ) / sumTriggerValue;
+        double fwdDrv;
+        if (Math.abs(lYVal) >= Math.abs(rYVal)) {
+        	fwdDrv = ((double)((int)(lYVal * 10)) ) / sumTriggerValue;
+        } else {
+        	fwdDrv = ((double)((int)(rYVal * 10)) ) / sumTriggerValue;
+        }
+        
+        double sldDrv = ((double)((int)(rXVal  * 10)) ) / sumTriggerValue;
         
         //SmartDashboard output
-        SmartDashboard.putDouble("LeftStickXValue", lXVal);
-        SmartDashboard.putDouble("LeftStickYValue", lYVal);
-        SmartDashboard.putDouble("RightStickXValue", rXVal);
-        SmartDashboard.putInt("POVPad", OI.controller.getPOV());
+        SmartDashboard.putDouble("Rotational Drive Value", rotDrv);
+        SmartDashboard.putDouble("Forward Drive Value", fwdDrv);
+        SmartDashboard.putDouble("Sliding Drive Value", sldDrv);
         SmartDashboard.putBoolean("Compressor Status", !mainCompressor.getPressureSwitchValue());
         
         //main drive controls
-        mainDrive.mecanumDrive_Cartesian(lXVal, lYVal, rXVal, 0);
+        mainDrive.mecanumDrive_Cartesian(rotDrv, fwdDrv, sldDrv, 0);
         
         //Compressor controls
         if(!mainCompressor.getPressureSwitchValue()){
@@ -145,9 +164,9 @@ public class Robot extends IterativeRobot {
         
         //Lifter Code
         if(OI.controller.getPOV() == 180){
-        	liftDrive.set(-.5);
+        	liftDrive.set(-.125);
         } else if(OI.controller.getPOV() == 0) {
-        	liftDrive.set(.5);
+        	liftDrive.set(.25);
         } else {
         	liftDrive.set(0);
         }
