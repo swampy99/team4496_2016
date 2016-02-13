@@ -33,7 +33,7 @@ public class Robot extends IterativeRobot {
 		Victor liftDrive;
 		Command autoMode;
 		SendableChooser autoChooser;
-		Timer timCat, timArm;
+		Timer timCat, timArm, timCatAlt, timArmAlt;
 		//DigitalInput upperSwitch, lowerSwitch;
 
 	    /**
@@ -62,6 +62,8 @@ public class Robot extends IterativeRobot {
         SmartDashboard.putData("Auto Chooser", autoChooser);
         timCat = new Timer();
         timArm = new Timer();
+        timCatAlt = new Timer();
+        timArmAlt = new Timer();
         //upperSwitch = new DigitalInput(0);
         //lowerSwitch = new DigitalInput(1);
         
@@ -115,6 +117,8 @@ public class Robot extends IterativeRobot {
         // teleop starts running. If you want the autonomous to 
         // continue until interrupted by another command, remove
         // this line or comment it out.
+    	timArmAlt.start();
+    	timCatAlt.start();
     }
 
     /**
@@ -148,6 +152,7 @@ public class Robot extends IterativeRobot {
         SmartDashboard.putDouble("Rotational Drive Value", rotDrv);
         SmartDashboard.putDouble("Forward Drive Value", fwdDrv);
         SmartDashboard.putDouble("Sliding Drive Value", sldDrv);
+        SmartDashboard.putInt("POV Value", OI.controller.getPOV());
         SmartDashboard.putBoolean("Compressor Status", !mainCompressor.getPressureSwitchValue());
         
         //main drive controls
@@ -161,20 +166,25 @@ public class Robot extends IterativeRobot {
         }
         
         //Grabber arm controls
-        if (OI.controller.getRawButton(5) && timArm.get() == 0) {
+        if (OI.controller.getRawButton(5) && timArm.get() == 0 && timArmAlt.get() >= 1) {
         	timArm.start();
+        	timArmAlt.stop();
+        	timArmAlt.reset();
         	grabberArm.set(true);
-        } else if(OI.controller.getRawButton(5) && timArm.get() >= 1) {
+        } else if(OI.controller.getRawButton(5) && timArm.get() >= 1 && timArmAlt.get() == 0) {
         	timArm.stop();
+        	timArmAlt.start();
         	timArm.reset();
         	grabberArm.set(false);
         }
         
         //Catapult controls
-        if (OI.controller.getRawButton(6) && timCat.get() == 0) {
+        if (OI.controller.getRawButton(6) && timCat.get() == 0 && timCatAlt.get() >= 1) {
         	timCat.start();
+        	timCatAlt.stop();
+        	timCatAlt.reset();
         	catapultArm.set(false);
-        } else if(timCat.get() >= 1) {
+        } else if(timCat.get() >= 1 && timCatAlt.get() == 0) {
         	timCat.stop();
         	timCat.reset();
         	catapultArm.set(true);
@@ -182,9 +192,9 @@ public class Robot extends IterativeRobot {
         
         //Lifter Code
         if(OI.controller.getPOV() == 180){
-        	liftDrive.set(-.125);
+        	liftDrive.set(-1);
         } else if(OI.controller.getPOV() == 0) {
-        	liftDrive.set(.25);
+        	liftDrive.set(1);
         } else {
         	liftDrive.set(0);
         }
