@@ -10,6 +10,9 @@ import edu.wpi.first.wpilibj.command.Scheduler;
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import org.usfirst.frc.team4496.robot.commands.*;
+import edu.wpi.first.wpilibj.Timer;
 
 
 /**
@@ -28,6 +31,9 @@ public class Robot extends IterativeRobot {
 		Compressor mainCompressor;
 		RobotDrive mainDrive, testDrive;
 		Victor liftDrive;
+		Command autoMode;
+		SendableChooser autoChooser;
+		Timer timCat, timArm;
 		//DigitalInput upperSwitch, lowerSwitch;
 
 	    /**
@@ -43,11 +49,24 @@ public class Robot extends IterativeRobot {
         mainDrive.setInvertedMotor(RobotDrive.MotorType.kFrontRight, true);
         mainDrive.setInvertedMotor(RobotDrive.MotorType.kRearRight, true);
         liftDrive = new Victor(4);
+        autoChooser = new SendableChooser();
+        autoChooser.addDefault("Bar Auto", new AutoBar());
+        autoChooser.addObject("Terrain Auto", new AutoTerrain());
+        autoChooser.addObject("Gate Auto", new AutoGate());        
+        autoChooser.addObject("Wall Auto", new AutoWall());
+        autoChooser.addObject("Sally Auto", new AutoSally());
+        autoChooser.addObject("Cheval Auto", new AutoCheval());
+        autoChooser.addObject("Moat Auto", new AutoMoat());
+        autoChooser.addObject("Bridge Auto", new AutoBridge());
+        autoChooser.addObject("Ramparts Auto", new AutoRamparts());
+        SmartDashboard.putData("Auto Chooser", autoChooser);
+        timCat = new Timer();
+        timArm = new Timer();
         //upperSwitch = new DigitalInput(0);
         //lowerSwitch = new DigitalInput(1);
         
         
-        //pnumatics declarations
+        //Pnumatics declarations
         mainCompressor = new Compressor();
         mainCompressor.setClosedLoopControl(false);
         grabberArm = new Solenoid(0);
@@ -79,7 +98,9 @@ public class Robot extends IterativeRobot {
 	 * or additional comparisons to the switch structure below with additional strings & commands.
 	 */
     public void autonomousInit() {
-    	
+    	Scheduler.getInstance().run();
+    	autoMode = (Command)autoChooser.getSelected();
+    	autoMode.start();
     }
 
     /**
@@ -104,14 +125,6 @@ public class Robot extends IterativeRobot {
         Scheduler.getInstance().run();
         int x = 20;
         //main drive setup
-        /*if(OI.controller.getRawButton(9)){
-        	x = 40;
-        } else if(OI.controller.getRawButton(10)) {
-        	x = 60;
-        } else {
-        	x = 20;
-        }*/
-        
         
         //Getting and rounding the input values
         double lXVal = OI.controller.getRawAxis(0);
@@ -148,17 +161,22 @@ public class Robot extends IterativeRobot {
         }
         
         //Grabber arm controls
-        if(OI.controller.getRawButton(1)){
+        if (OI.controller.getRawButton(5) && timArm.get() == 0) {
+        	timArm.start();
         	grabberArm.set(true);
-        } 
-        if(OI.controller.getRawButton(2)) {
+        } else if(OI.controller.getRawButton(5) && timArm.get() >= 1) {
+        	timArm.stop();
+        	timArm.reset();
         	grabberArm.set(false);
         }
         
         //Catapult controls
-        if(OI.controller.getRawButton(6)){
+        if (OI.controller.getRawButton(6) && timCat.get() == 0) {
+        	timCat.start();
         	catapultArm.set(false);
-        } else {
+        } else if(timCat.get() >= 1) {
+        	timCat.stop();
+        	timCat.reset();
         	catapultArm.set(true);
         }
         
