@@ -25,15 +25,15 @@ import edu.wpi.first.wpilibj.Timer;
 public class Robot extends IterativeRobot {
 	public static OI oi;
 
-		//###################Ben was here
+		//Ben was here
 		//start of added code
-		Solenoid grabberArm, catapultArm;
+		Solenoid grabberArm;
 		Compressor mainCompressor;
 		RobotDrive mainDrive, testDrive;
-		Victor liftDrive;
+		Victor liftDrive, catDrive;
 		Command autoMode;
 		SendableChooser autoChooser;
-		Timer timCat, timArm, timCatAlt, timArmAlt;
+		Timer timArm, timArmAlt;
 		//DigitalInput upperSwitch, lowerSwitch;
 
 	    /**
@@ -60,9 +60,7 @@ public class Robot extends IterativeRobot {
         autoChooser.addObject("Bridge Auto", new AutoBridge());
         autoChooser.addObject("Ramparts Auto", new AutoRamparts());
         SmartDashboard.putData("Auto Chooser", autoChooser);
-        timCat = new Timer();
         timArm = new Timer();
-        timCatAlt = new Timer();
         timArmAlt = new Timer();
         //upperSwitch = new DigitalInput(0);
         //lowerSwitch = new DigitalInput(1);
@@ -72,7 +70,6 @@ public class Robot extends IterativeRobot {
         mainCompressor = new Compressor();
         mainCompressor.setClosedLoopControl(false);
         grabberArm = new Solenoid(0);
-        catapultArm = new Solenoid(1);
         
         
     }
@@ -118,7 +115,7 @@ public class Robot extends IterativeRobot {
         // continue until interrupted by another command, remove
         // this line or comment it out.
     	timArmAlt.start();
-    	timCatAlt.start();
+    	catDrive.set(0);
     }
 
     /**
@@ -127,7 +124,6 @@ public class Robot extends IterativeRobot {
     @SuppressWarnings("deprecation")
 	public void teleopPeriodic() {
         Scheduler.getInstance().run();
-        int x = 20;
         //main drive setup
         
         //Getting and rounding the input values
@@ -176,18 +172,6 @@ public class Robot extends IterativeRobot {
         	timArmAlt.start();
         	timArm.reset();
         	grabberArm.set(false);
-        }
-        
-        //Catapult controls
-        if (OI.controller.getRawButton(6) && timCat.get() == 0 && timCatAlt.get() >= 1) {
-        	timCat.start();
-        	timCatAlt.stop();
-        	timCatAlt.reset();
-        	catapultArm.set(false);
-        } else if(timCat.get() >= 1 && timCatAlt.get() == 0) {
-        	timCat.stop();
-        	timCat.reset();
-        	catapultArm.set(true);
         }
         
         //Lifter Code
