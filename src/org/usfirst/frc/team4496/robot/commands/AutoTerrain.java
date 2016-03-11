@@ -1,14 +1,17 @@
 
 package org.usfirst.frc.team4496.robot.commands;
 
+import edu.wpi.first.wpilibj.RobotDrive;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.command.Command;
-
-import org.usfirst.frc.team4496.robot.Robot;
 
 /**
  *
  */
 public class AutoTerrain extends Command {
+	
+	RobotDrive autoDrive = new RobotDrive(0, 1, 2, 3);
+	Timer moveTimer = new Timer();
 
     public AutoTerrain() {
         // Use requires() here to declare subsystem dependencies
@@ -17,10 +20,17 @@ public class AutoTerrain extends Command {
 
     // Called just before this Command runs the first time
     protected void initialize() {
+    moveTimer.start();
     }
 
     // Called repeatedly when this Command is scheduled to run
     protected void execute() {
+    	if (moveTimer.get() <= 2){
+    	autoDrive.arcadeDrive(1, 0);
+    	}
+    	moveTimer.stop();
+    	moveTimer.reset();
+    	
     }
 
     // Make this return true when this Command no longer needs to run execute()
